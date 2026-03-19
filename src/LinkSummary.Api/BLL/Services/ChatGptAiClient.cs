@@ -35,50 +35,6 @@ namespace LinkSummary.Api.BLL.Services
             );
         }
 
-        // Метод для запросов с изображением (по URL)
-        public async Task<string> GetImageResponseAsync(string prompt, string systemPrompt, string imageUrl)
-        {
-            var messages = new List<object>
-            {
-                new
-                {
-                    role = "system",
-                    content = systemPrompt
-                },
-                new
-                {
-                    role = "user",
-                    content = new List<object>
-                    {
-                        new
-                        {
-                            type = "text",
-                            text = prompt
-                        },
-                        new
-                        {
-                            type = "image_url",
-                            image_url = new
-                            {
-                                url = imageUrl
-                            }
-                        }
-                    }
-                }
-            };
-
-            return await GetResponseInternalAsync(messages.ToArray());
-        }
-
-        // Метод для запросов с изображением (base64)
-        public async Task<string> GetImageResponseAsync(string prompt, string systemPrompt, byte[] imageData, string mimeType = "image/jpeg")
-        {
-            var base64Image = Convert.ToBase64String(imageData);
-            var imageDataUrl = $"data:{mimeType};base64,{base64Image}";
-
-            return await GetImageResponseAsync(prompt, systemPrompt, imageDataUrl);
-        }
-
         // Общий внутренний метод для отправки запроса
         private async Task<string> GetResponseInternalAsync(object[] messages, CancellationToken cancellationToken = default)
         {
