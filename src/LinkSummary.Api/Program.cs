@@ -1,12 +1,21 @@
+using LinkSummary.Api.AppStart;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+var startup = new Startup(builder);
+startup.Initialize();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+if (builder.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    //app.ApplyCors();
+}
 
 app.UseHttpsRedirection();
 
