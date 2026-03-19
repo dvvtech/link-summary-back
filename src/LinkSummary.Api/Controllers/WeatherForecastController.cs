@@ -1,3 +1,4 @@
+using LinkSummary.Api.BLL.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkSummary.Api.Controllers
@@ -13,9 +14,22 @@ namespace LinkSummary.Api.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly IAiClient _aiClient;
+
+        public WeatherForecastController(
+            IAiClient aiClient,
+            ILogger<WeatherForecastController> logger)
         {
+            _aiClient = aiClient;
             _logger = logger;
+        }
+
+        [HttpGet("test")]
+        public async Task<string> Test()
+        {
+            _logger.LogInformation("call test");
+            var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
+            return res;
         }
 
         [HttpGet]
