@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37027.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{F0A30A95-12E3-42DB-8766-24BEDFA8A9E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkSummary.Api", "src\LinkSummary.Api\LinkSummary.Api.csproj", "{CDADF9EC-DAFD-4F1D-AD54-FF1744013937}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDADF9EC-DAFD-4F1D-AD54-FF1744013937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDADF9EC-DAFD-4F1D-AD54-FF1744013937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDADF9EC-DAFD-4F1D-AD54-FF1744013937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDADF9EC-DAFD-4F1D-AD54-FF1744013937}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CDADF9EC-DAFD-4F1D-AD54-FF1744013937} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6E57EF42-66F7-4E33-B665-C2EC4300159B}
+	EndGlobalSection
+EndGlobal
