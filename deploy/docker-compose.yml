@@ -1,5 +1,5 @@
 services:
-  mpp_tests_api:
+  link_summary_api:
     container_name: link-summary-api-container
     build:
       context: ..
