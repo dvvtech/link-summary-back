@@ -1,4 +1,5 @@
-﻿using LinkSummary.Api.BLL.Abstract;
+﻿using LinkSummary.Api.AppStart.Extensions;
+using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.BLL.Services;
 using LinkSummary.Api.Configuration;
 using System.Net;
@@ -22,7 +23,7 @@ namespace LinkSummary.Api.AppStart
             }
             else
             {
-                //_builder.Services.ConfigureCors();
+                _builder.Services.ConfigureCors();
             }
 
             InitConfigs();

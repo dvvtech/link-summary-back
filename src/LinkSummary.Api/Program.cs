@@ -1,4 +1,5 @@
 using LinkSummary.Api.AppStart;
+using LinkSummary.Api.AppStart.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +14,8 @@ if (builder.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 else
-{
-    //app.ApplyCors();
+{    
+    app.ApplyCors();
 }
 
 app.UseHttpsRedirection();
