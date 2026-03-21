@@ -18,7 +18,7 @@ namespace LinkSummary.Api.Controllers
             _summarizeService = summarizeService;
         }
 
-        [HttpPost("summarize")]
+        [HttpPost("run")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Url))
@@ -77,6 +77,13 @@ namespace LinkSummary.Api.Controllers
                     ErrorMessage = $"Произошла ошибка: {ex.Message}"
                 });
             }
+        }
+
+        [HttpGet("test2")]
+        public string Test2()
+        {
+            //_logger.LogInformation("call test2");
+            return "1477";
         }
     }
 }
