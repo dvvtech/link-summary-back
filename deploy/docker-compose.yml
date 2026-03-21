@@ -1,0 +1,29 @@
+services:
+  mpp_tests_api:
+    container_name: link-summary-api-container
+    build:
+      context: ..
+      dockerfile: src/LinkSummary.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Prod
+      - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
+      - ProxySettings__Ip=${IP_KEY}
+      - ProxySettings__Port=${PORT_KEY}
+      - ProxySettings__Login=${LOGIN_KEY}
+      - ProxySettings__Password=${PASSWORD_KEY}
+      
+    restart: unless-stopped    
+    networks:
+      - public-network
+    labels:      
+      - "traefik.enable=true"      
+      - "traefik.http.routers.link-summary-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/link-summary`)"
+      - "traefik.http.routers.link-summary-api.entrypoints=websecure"
+      - "traefik.http.routers.link-summary-api.tls.certresolver=letsencrypt"     
+      - "traefik.http.services.link-summary-api.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.link-summary-stripprefix.stripprefix.prefixes=/link-summary"
+      - "traefik.http.routers.link-summary-api.middlewares=link-summary-stripprefix"
+
+networks:
+  public-network:
+    external: true
