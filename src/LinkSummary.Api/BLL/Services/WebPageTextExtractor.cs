@@ -44,9 +44,9 @@ namespace LinkSummary.Api.BLL.Services
 
             var result = string.Join("\n\n", textParts);
 
-            if (result.Length > 15000)
+            if (result.Length > 21000)
             {
-                result = result.Substring(0, 15000);
+                result = result.Substring(0, 21000);
             }
 
             return result;
