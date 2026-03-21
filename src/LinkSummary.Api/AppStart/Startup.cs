@@ -27,6 +27,7 @@ namespace LinkSummary.Api.AppStart
 
             InitConfigs();
             ConfigureClientAPI();
+            ConfigureServices();
 
             _builder.Services.AddControllers();
         }
@@ -36,6 +37,13 @@ namespace LinkSummary.Api.AppStart
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
         }
+        
+        private void ConfigureServices()
+        {
+            _builder.Services.AddHttpClient<IWebPageTextExtractor, WebPageTextExtractor>();
+            _builder.Services.AddScoped<ISummarizeService, SummarizeService>();
+        }
+        
         private void ConfigureClientAPI()
         {                        
             _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
@@ -43,14 +51,13 @@ namespace LinkSummary.Api.AppStart
                 var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
 
                 client.BaseAddress = new Uri("https://api.openai.com/v1/chat/completions");
-                client.Timeout = TimeSpan.FromSeconds(35); // Таймаут запроса
+                client.Timeout = TimeSpan.FromSeconds(120);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {aiClientConfig.OpenAiApiKey}");
             })
                 .ConfigurePrimaryHttpMessageHandler(() =>
                 {
                     var handler = new HttpClientHandler();
 
-                    // Получаем настройки прокси из конфигурации
                     var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
 
                     if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
@@ -62,7 +69,6 @@ namespace LinkSummary.Api.AppStart
                             UseDefaultCredentials = false
                         };
 
-                        // Если есть логин и пароль
                         if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password))
                         {
                             proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password);

@@ -4,6 +4,6 @@
     {
         public const string SectionName = "AiClientConfig";
 
-        public string OpenAiApiKey { get; init; }
+        public string OpenAiApiKey { get; init; } = string.Empty;
     }
 }
