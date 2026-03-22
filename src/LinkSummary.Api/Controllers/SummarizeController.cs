@@ -109,12 +109,14 @@ namespace LinkSummary.Api.Controllers
             {
                 request.Headers.Add("User-Agent", userAgent);
             }
-
+            _logger.LogInformation("Send track-link-summary1");
             var response = await httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
+                _logger.LogInformation("error Send track-link-summary1");
             }
+            _logger.LogInformation("Send track-link-summary1");
         }
 
         private string GetRealClientIp(HttpContext context)
