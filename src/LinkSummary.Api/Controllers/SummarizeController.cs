@@ -51,7 +51,7 @@ namespace LinkSummary.Api.Controllers
 
             try
             {
-                _ = TrackVisitLinkSummaryAsync();
+                await TrackVisitLinkSummaryAsync();
 
                 var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
 
