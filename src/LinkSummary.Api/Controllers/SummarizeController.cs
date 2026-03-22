@@ -103,8 +103,8 @@ namespace LinkSummary.Api.Controllers
 
                 request.Headers.Add("X-Forwarded-For", clientIp);
                 request.Headers.Add("X-Real-IP", clientIp);
-                var encodedLink = Uri.EscapeDataString(link);
-                request.Headers.Add("X-Operation-Link", encodedLink);
+                //var encodedLink = Uri.EscapeDataString(link);
+                request.Headers.Add("X-Operation-Link", link);
                 
                 // Прокидываем оригинальный User-Agent
                 var userAgent = Request.Headers["User-Agent"].ToString();
