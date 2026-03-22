@@ -21,6 +21,7 @@ namespace LinkSummary.Api.Controllers
         {
             _webPageTextExtractor = webPageTextExtractor;
             _summarizeService = summarizeService;
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
 
         }
