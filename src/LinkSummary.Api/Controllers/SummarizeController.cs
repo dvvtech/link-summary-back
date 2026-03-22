@@ -64,7 +64,8 @@ namespace LinkSummary.Api.Controllers
                     });
                 }
 
-                var summary = await _summarizeService.SummarizeTextAsync(extractedText);
+                //var summary = await _summarizeService.SummarizeTextAsync(extractedText);
+                var summary = extractedText.Substring(0, 50);
 
                 return Ok(new SummarizeResponse
                 {
