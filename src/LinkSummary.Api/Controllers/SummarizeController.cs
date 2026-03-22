@@ -28,6 +28,8 @@ namespace LinkSummary.Api.Controllers
         [HttpPost("run")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
         {
+            _logger.LogInformation($"hello");
+
             if (string.IsNullOrWhiteSpace(request.Url))
             {
                 return BadRequest(new SummarizeResponse
