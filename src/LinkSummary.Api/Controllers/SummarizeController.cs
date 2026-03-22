@@ -93,33 +93,41 @@ namespace LinkSummary.Api.Controllers
 
         private async Task TrackVisitLinkSummaryAsync()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var clientIp = GetRealClientIp(HttpContext);
-
-            // Создаем запрос к analytics
-            var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                "http://analytics-api-container:8080/v1/analytics/track-link-summary");
-
-            request.Headers.Add("X-Forwarded-For", clientIp);
-            request.Headers.Add("X-Real-IP", clientIp);
-            request.Headers.Add("X-Operation-Type", "calc");
-
-            // Прокидываем оригинальный User-Agent
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            if (!string.IsNullOrEmpty(userAgent))
+            try
             {
-                request.Headers.Add("User-Agent", userAgent);
+                _logger.LogInformation("1");
+                var httpClient = _httpClientFactory.CreateClient();
+                _logger.LogInformation("2");
+                var clientIp = GetRealClientIp(HttpContext);
+                _logger.LogInformation("3");
+                // Создаем запрос к analytics
+                var request = new HttpRequestMessage(
+                    HttpMethod.Get,
+                    "http://analytics-api-container:8080/v1/analytics/track-link-summary");
+                _logger.LogInformation("4");
+                request.Headers.Add("X-Forwarded-For", clientIp);
+                request.Headers.Add("X-Real-IP", clientIp);
+                request.Headers.Add("X-Operation-Type", "calc");
+                _logger.LogInformation("5");
+                // Прокидываем оригинальный User-Agent
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                if (!string.IsNullOrEmpty(userAgent))
+                {
+                    request.Headers.Add("User-Agent", userAgent);
+                }
+                _logger.LogInformation("Send track-link-summary1");
+                var response = await httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
+                    _logger.LogInformation("error Send track-link-summary1");
+                }
+                _logger.LogInformation("Send track-link-summary1");
             }
-            _logger.LogInformation("Send track-link-summary1");
-            var response = await httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
-                _logger.LogInformation("error Send track-link-summary1");
+                _logger.LogError("error:" + ex.ToString());
             }
-            _logger.LogInformation("Send track-link-summary1");
         }
 
         private string GetRealClientIp(HttpContext context)
