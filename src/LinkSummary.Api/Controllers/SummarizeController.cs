@@ -63,7 +63,7 @@ namespace LinkSummary.Api.Controllers
                     });
                 }
 
-                var summary = await _summarizeService.SummarizeTextAsync(extractedText);                
+                var summary = "hello";//await _summarizeService.SummarizeTextAsync(extractedText);                
 
                 return Ok(new SummarizeResponse
                 {
@@ -103,7 +103,8 @@ namespace LinkSummary.Api.Controllers
 
                 request.Headers.Add("X-Forwarded-For", clientIp);
                 request.Headers.Add("X-Real-IP", clientIp);
-                request.Headers.Add("X-Operation-Link", link);
+                var encodedLink = Uri.EscapeDataString(link);
+                request.Headers.Add("X-Operation-Link", encodedLink);
                 
                 // Прокидываем оригинальный User-Agent
                 var userAgent = Request.Headers["User-Agent"].ToString();
