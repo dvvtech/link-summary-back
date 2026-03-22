@@ -105,7 +105,7 @@ namespace LinkSummary.Api.Controllers
                 request.Headers.Add("X-Real-IP", clientIp);
                 //var encodedLink = Uri.EscapeDataString(link);
                 request.Headers.Add("X-Operation-Link", link);
-                
+                _logger.LogInformation("ip: " + clientIp);
                 // Прокидываем оригинальный User-Agent
                 var userAgent = Request.Headers["User-Agent"].ToString();
                 if (!string.IsNullOrEmpty(userAgent))
