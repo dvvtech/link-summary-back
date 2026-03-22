@@ -28,9 +28,7 @@ namespace LinkSummary.Api.Controllers
 
         [HttpPost("run")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
-        {
-            _logger.LogInformation($"hello");
-
+        {            
             if (string.IsNullOrWhiteSpace(request.Url))
             {
                 return BadRequest(new SummarizeResponse
@@ -65,8 +63,7 @@ namespace LinkSummary.Api.Controllers
                     });
                 }
 
-                //var summary = await _summarizeService.SummarizeTextAsync(extractedText);
-                var summary = extractedText.Substring(0, 50);
+                var summary = await _summarizeService.SummarizeTextAsync(extractedText);                
 
                 return Ok(new SummarizeResponse
                 {
