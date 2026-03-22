@@ -50,7 +50,7 @@ namespace LinkSummary.Api.Controllers
 
             try
             {
-                _ = TrackVisitLinkSummaryAsync();
+                _ = TrackVisitLinkSummaryAsync(request.Url);
 
                 var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
 
@@ -89,7 +89,7 @@ namespace LinkSummary.Api.Controllers
             }
         }
 
-        private async Task TrackVisitLinkSummaryAsync()
+        private async Task TrackVisitLinkSummaryAsync(string link)
         {
             try
             {                
@@ -103,7 +103,7 @@ namespace LinkSummary.Api.Controllers
 
                 request.Headers.Add("X-Forwarded-For", clientIp);
                 request.Headers.Add("X-Real-IP", clientIp);
-                request.Headers.Add("X-Operation-Type", "calc");
+                request.Headers.Add("X-Operation-Link", link);
                 
                 // Прокидываем оригинальный User-Agent
                 var userAgent = Request.Headers["User-Agent"].ToString();
