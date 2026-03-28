@@ -25,5 +25,5 @@ services:
       - "traefik.http.routers.link-summary-api.middlewares=link-summary-stripprefix"
 
 networks:
-  public-network:
+  public-network2:
     external: true
