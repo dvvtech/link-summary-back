@@ -1,6 +1,7 @@
+version: '3.8'
+
 services:
-  link_summary_api:
-    container_name: link-summary-api-container
+  link_summary_api:    
     build:
       context: ..
       dockerfile: src/LinkSummary.Api/Dockerfile
@@ -10,20 +11,26 @@ services:
       - ProxySettings__Ip=${IP_KEY}
       - ProxySettings__Port=${PORT_KEY}
       - ProxySettings__Login=${LOGIN_KEY}
-      - ProxySettings__Password=${PASSWORD_KEY}
-      
-    restart: unless-stopped    
+      - ProxySettings__Password=${PASSWORD_KEY}    
     networks:
-      - public-network2
-    labels:      
-      - "traefik.enable=true"      
-      - "traefik.http.routers.link-summary-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/link-summary`)"
-      - "traefik.http.routers.link-summary-api.entrypoints=websecure"
-      - "traefik.http.routers.link-summary-api.tls.certresolver=letsencrypt"     
-      - "traefik.http.services.link-summary-api.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.link-summary-stripprefix.stripprefix.prefixes=/link-summary"
-      - "traefik.http.routers.link-summary-api.middlewares=link-summary-stripprefix"
+      - public-network5
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.link-summary-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/link-summary`)"
+        - "traefik.http.routers.link-summary-api.entrypoints=websecure"
+        - "traefik.http.routers.link-summary-api.tls.certresolver=letsencrypt"
+        - "traefik.http.services.link-summary-api.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.link-summary-stripprefix.stripprefix.prefixes=/link-summary"
+        - "traefik.http.routers.link-summary-api.middlewares=link-summary-stripprefix"      
 
 networks:
-  public-network2:
+  public-network5:
     external: true
+    name: public-network5
