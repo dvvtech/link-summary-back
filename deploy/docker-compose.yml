@@ -1,19 +1,15 @@
-version: '3.8'
-
 services:
   link_summary_api:    
-    build:
-      context: ..
-      dockerfile: src/LinkSummary.Api/Dockerfile
+    image: ghcr.io/dvvtech/link-summary-back:latest
     environment:
-      - ASPNETCORE_ENVIRONMENT=Prod
-      - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
-      - ProxySettings__Ip=${IP_KEY}
-      - ProxySettings__Port=${PORT_KEY}
-      - ProxySettings__Login=${LOGIN_KEY}
-      - ProxySettings__Password=${PASSWORD_KEY}    
+      - ASPNETCORE_ENVIRONMENT=Prod      
     networks:
       - public-network5
+    secrets:
+      - AiClientConfig__OpenAiApiKey
+      - ProxySettings__Ip      
+      - ProxySettings__Login
+      - ProxySettings__Password
     deploy:
       mode: replicated
       replicas: 1
@@ -34,3 +30,13 @@ networks:
   public-network5:
     external: true
     name: public-network5
+
+secrets:
+  AiClientConfig__OpenAiApiKey:
+    external: true  
+  ProxySettings__Ip:
+    external: true
+  ProxySettings__Login:
+    external: true
+  ProxySettings__Password:
+    external: true

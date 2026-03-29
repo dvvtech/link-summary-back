@@ -12,7 +12,12 @@ namespace LinkSummary.Api.BLL.Services
             _httpClient = httpClient;
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
         }
-
+        /// <summary>
+        /// /
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<string> ExtractTextFromUrlAsync(string url, CancellationToken cancellationToken = default)
         {
             var html = await _httpClient.GetStringAsync(url, cancellationToken);

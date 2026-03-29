@@ -38,12 +38,17 @@ namespace LinkSummary.Api.AppStart
 
         private void InitConfigs()
         {
+            if (!_builder.Environment.IsDevelopment())
+            {
+                _builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+            }
+
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
         }
         
         private void ConfigureServices()
-        {
+        {            
             _builder.Services.AddHttpClient<IWebPageTextExtractor, WebPageTextExtractor>();
             _builder.Services.AddScoped<ISummarizeService, SummarizeService>();
         }
