@@ -2,6 +2,7 @@
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.BLL.Services;
 using LinkSummary.Api.Configuration;
+using LinkSummary.Api.HealthChecks;
 using System.Net;
 
 namespace LinkSummary.Api.AppStart
@@ -32,6 +33,10 @@ namespace LinkSummary.Api.AppStart
             InitConfigs();
             ConfigureClientAPI();
             ConfigureServices();
+
+            _builder.Services
+                .AddHealthChecks()
+                .AddCheck<ProxyHealthCheck>(nameof(ProxyHealthCheck));
 
             _builder.Services.AddControllers();
         }

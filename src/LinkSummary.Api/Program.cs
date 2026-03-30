@@ -1,3 +1,4 @@
+using HealthChecks.UI.Client;
 using LinkSummary.Api.AppStart;
 using LinkSummary.Api.AppStart.Extensions;
 
@@ -19,9 +20,12 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions 
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();
