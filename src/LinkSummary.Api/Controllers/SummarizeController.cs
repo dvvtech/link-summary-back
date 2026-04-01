@@ -8,20 +8,20 @@ namespace LinkSummary.Api.Controllers
     [Route("")]
     public class SummarizeController : ControllerBase
     {
+        private readonly IAnalyticsTrackingService _analyticsTrackingService;
         private readonly IWebPageTextExtractor _webPageTextExtractor;
         private readonly ISummarizeService _summarizeService;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<SummarizeController> _logger;
 
         public SummarizeController(
+            IAnalyticsTrackingService analyticsTrackingService,
             IWebPageTextExtractor webPageTextExtractor,
             ISummarizeService summarizeService,
-            IHttpClientFactory httpClientFactory,
             ILogger<SummarizeController> logger)
         {
+            _analyticsTrackingService = analyticsTrackingService;
             _webPageTextExtractor = webPageTextExtractor;
             _summarizeService = summarizeService;
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
 
         }
@@ -50,7 +50,10 @@ namespace LinkSummary.Api.Controllers
 
             try
             {
-                _ = TrackVisitLinkSummaryAsync(request.Url);
+                var clientIp = GetRealClientIp(HttpContext);
+                var userAgent = Request.Headers["User-Agent"].ToString();
+
+                _ = _analyticsTrackingService.TrackLinkSummaryVisitAsync(request.Url, clientIp, userAgent);
 
                 var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
 
@@ -86,42 +89,6 @@ namespace LinkSummary.Api.Controllers
                     Success = false,
                     ErrorMessage = $"Произошла ошибка: {ex.Message}"
                 });
-            }
-        }
-
-        private async Task TrackVisitLinkSummaryAsync(string link)
-        {
-            try
-            {
-                var httpClient = _httpClientFactory.CreateClient();
-                var clientIp = GetRealClientIp(HttpContext);
-
-                // Создаем запрос к analytics
-                var request = new HttpRequestMessage(
-                    HttpMethod.Get,
-                    "http://analytics_api:8080/v1/analytics/track-link-summary");
-
-                request.Headers.Add("X-Forwarded-For", clientIp);
-                request.Headers.Add("X-Real-IP", clientIp);
-                request.Headers.Add("X-Operation-Link", link);
-
-                // Прокидываем оригинальный User-Agent
-                var userAgent = Request.Headers["User-Agent"].ToString();
-                if (!string.IsNullOrEmpty(userAgent))
-                {
-                    request.Headers.Add("User-Agent", userAgent);
-                }
-
-                var response = await httpClient.SendAsync(request);
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
-                    _logger.LogInformation("error Send track-link-summary1");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("error:" + ex.ToString());
             }
         }
 

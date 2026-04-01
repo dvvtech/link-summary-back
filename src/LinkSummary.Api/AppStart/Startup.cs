@@ -54,6 +54,7 @@ namespace LinkSummary.Api.AppStart
         
         private void ConfigureServices()
         {
+            _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
             _builder.Services.AddScoped<IPromptService, PromptService>();
             _builder.Services.AddHttpClient<IWebPageTextExtractor, WebPageTextExtractor>();
             _builder.Services.AddScoped<ISummarizeService, SummarizeService>();
