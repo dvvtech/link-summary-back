@@ -147,7 +147,8 @@ namespace LinkSummary.Api.Controllers
         [HttpGet("test2")]
         public string Test2()
         {
-            //_logger.LogInformation("call test2");
+            var clientIp = GetRealClientIp(HttpContext);
+            _logger.LogInformation($"ip: {clientIp}");
             return "1477";
         }
     }
