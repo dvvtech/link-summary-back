@@ -126,13 +126,7 @@ namespace LinkSummary.Api.Controllers
         }
 
         private string GetRealClientIp(HttpContext context)
-        {
-            var remoteIp = context.Connection.RemoteIpAddress;
-            if (remoteIp != null)
-            {
-                return remoteIp.MapToIPv4().ToString();
-            }
-
+        {            
             var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrEmpty(forwardedFor))
             {
