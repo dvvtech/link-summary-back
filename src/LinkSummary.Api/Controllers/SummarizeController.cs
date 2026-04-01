@@ -30,6 +30,8 @@ namespace LinkSummary.Api.Controllers
         [HttpPost("run")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
         {            
+            LogClientIpDiagnostics(HttpContext);
+
             if (string.IsNullOrWhiteSpace(request.Url))
             {
                 return BadRequest(new SummarizeResponse
@@ -202,9 +204,29 @@ namespace LinkSummary.Api.Controllers
         [HttpGet("test2")]
         public string Test2()
         {
+            LogClientIpDiagnostics(HttpContext);
             var clientIp = GetRealClientIp(HttpContext);
             _logger.LogInformation($"ip: {clientIp}");
             return "1477";
+        }
+
+        private void LogClientIpDiagnostics(HttpContext context)
+        {
+            var remoteIp = context.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "unknown";
+            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? "<missing>";
+            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault() ?? "<missing>";
+            var trueClientIp = context.Request.Headers["True-Client-IP"].FirstOrDefault() ?? "<missing>";
+            var cfConnectingIp = context.Request.Headers["CF-Connecting-IP"].FirstOrDefault() ?? "<missing>";
+            var forwarded = context.Request.Headers["Forwarded"].FirstOrDefault() ?? "<missing>";
+
+            _logger.LogInformation(
+                "IP diagnostics. RemoteIpAddress: {RemoteIpAddress}; X-Forwarded-For: {XForwardedFor}; X-Real-IP: {XRealIp}; True-Client-IP: {TrueClientIp}; CF-Connecting-IP: {CfConnectingIp}; Forwarded: {Forwarded}",
+                remoteIp,
+                forwardedFor,
+                realIp,
+                trueClientIp,
+                cfConnectingIp,
+                forwarded);
         }
     }
 }
