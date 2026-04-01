@@ -1,5 +1,6 @@
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.Models;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkSummary.Api.Controllers
@@ -127,25 +128,75 @@ namespace LinkSummary.Api.Controllers
 
         private string GetRealClientIp(HttpContext context)
         {
+            var candidateIps = new List<string>();
+
+            AddHeaderValues(candidateIps, context.Request.Headers["CF-Connecting-IP"].FirstOrDefault());
+            AddHeaderValues(candidateIps, context.Request.Headers["True-Client-IP"].FirstOrDefault());
+            AddHeaderValues(candidateIps, context.Request.Headers["X-Forwarded-For"].FirstOrDefault());
+            AddHeaderValues(candidateIps, context.Request.Headers["X-Real-IP"].FirstOrDefault());
+
             var remoteIp = context.Connection.RemoteIpAddress;
             if (remoteIp != null)
             {
-                return remoteIp.MapToIPv4().ToString();
+                candidateIps.Add(remoteIp.MapToIPv4().ToString());
             }
 
-            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedFor))
+            var parsedIps = candidateIps
+                .Select(TryParseIp)
+                .Where(ip => ip != null)
+                .Cast<IPAddress>()
+                .ToList();
+
+            var publicIp = parsedIps.FirstOrDefault(ip => !IsPrivateIp(ip));
+            if (publicIp != null)
             {
-                return forwardedFor.Split(',').First().Trim();
+                return publicIp.MapToIPv4().ToString();
             }
 
-            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(realIp))
+            return parsedIps.FirstOrDefault()?.MapToIPv4().ToString() ?? "unknown";
+        }
+
+        private static void AddHeaderValues(List<string> candidateIps, string? headerValue)
+        {
+            if (string.IsNullOrWhiteSpace(headerValue))
             {
-                return realIp;
+                return;
             }
 
-            return "unknown";
+            foreach (var ip in headerValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                candidateIps.Add(ip);
+            }
+        }
+
+        private static IPAddress? TryParseIp(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            return IPAddress.TryParse(value, out var ip) ? ip.MapToIPv4() : null;
+        }
+
+        private static bool IsPrivateIp(IPAddress ip)
+        {
+            if (IPAddress.IsLoopback(ip))
+            {
+                return true;
+            }
+
+            var bytes = ip.MapToIPv4().GetAddressBytes();
+
+            return bytes[0] switch
+            {
+                10 => true,
+                127 => true,
+                169 when bytes[1] == 254 => true,
+                172 when bytes[1] >= 16 && bytes[1] <= 31 => true,
+                192 when bytes[1] == 168 => true,
+                _ => false
+            };
         }
 
         [HttpGet("test2")]
