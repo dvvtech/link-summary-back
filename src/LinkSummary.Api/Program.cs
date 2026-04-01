@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*builder.Services.Configure<ForwardedHeadersOptions>(options =>
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
     // The app is behind a reverse proxy, so do not restrict forwarded headers to loopback only.
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
-});*/
+});
 
 var startup = new Startup(builder);
 startup.Initialize();
