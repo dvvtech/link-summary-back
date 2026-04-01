@@ -93,13 +93,16 @@ namespace LinkSummary.Api.Controllers
         {
             try
             {
-                var httpClient = _httpClientFactory.CreateClient();                
+                var httpClient = _httpClientFactory.CreateClient();
+                var clientIp = GetRealClientIp(HttpContext);
 
                 // Создаем запрос к analytics
                 var request = new HttpRequestMessage(
                     HttpMethod.Get,
                     "http://analytics_api:8080/v1/analytics/track-link-summary");
-                
+
+                request.Headers.Add("X-Forwarded-For", clientIp);
+                request.Headers.Add("X-Real-IP", clientIp);
                 request.Headers.Add("X-Operation-Link", link);
 
                 // Прокидываем оригинальный User-Agent
@@ -122,10 +125,28 @@ namespace LinkSummary.Api.Controllers
             }
         }
 
+        private string GetRealClientIp(HttpContext context)
+        {            
+            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                return forwardedFor.Split(',').First().Trim();
+            }
+
+            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(realIp))
+            {
+                return realIp;
+            }
+
+            return "unknown";
+        }
+
         [HttpGet("test2")]
         public string Test2()
-        {            
-            //_logger.LogInformation($"ip:");
+        {
+            var clientIp = GetRealClientIp(HttpContext);
+            _logger.LogInformation($"ip: {clientIp}");
             return "1477";
         }
     }
