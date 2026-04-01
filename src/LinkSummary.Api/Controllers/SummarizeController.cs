@@ -127,10 +127,15 @@ namespace LinkSummary.Api.Controllers
 
         private string GetRealClientIp(HttpContext context)
         {
+            var remoteIp = context.Connection.RemoteIpAddress;
+            if (remoteIp != null)
+            {
+                return remoteIp.MapToIPv4().ToString();
+            }
+
             var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrEmpty(forwardedFor))
             {
-                // Берем первый IP из цепочки (реальный клиентский)
                 return forwardedFor.Split(',').First().Trim();
             }
 
@@ -140,8 +145,7 @@ namespace LinkSummary.Api.Controllers
                 return realIp;
             }
 
-            // Если нет заголовков, используем RemoteIpAddress
-            return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            return "unknown";
         }
 
         [HttpGet("test2")]
