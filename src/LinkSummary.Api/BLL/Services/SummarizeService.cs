@@ -5,20 +5,23 @@ namespace LinkSummary.Api.BLL.Services
     public class SummarizeService : ISummarizeService
     {
         private readonly IAiClient _aiClient;
-        
-        private const string SystemPrompt = "Ты - профессиональный суммаризатор текста. Твоя задача - анализировать статьи и создавать их краткое содержание. Всегда отвечай на русском языке, независимо от языка исходного текста.";
-        
-        private const string UserPromptTemplate = "Проанализируй статью ниже и выдели самые важные моменты. Составь краткое содержание (7-9 предложений), которое передает основную суть статьи. Сохрани ключевые факты и выводы. Отвечай на русском языке. Вот текст статьи:\n\n{0}";
+        private readonly IPromptService _promptService;
 
-        public SummarizeService(IAiClient aiClient)
+        public SummarizeService(
+            IAiClient aiClient,
+            IPromptService promptService)
         {
             _aiClient = aiClient;
+            _promptService = promptService;
         }
 
         public async Task<string> SummarizeTextAsync(string text, CancellationToken cancellationToken = default)
         {
-            var userPrompt = string.Format(UserPromptTemplate, text);
-            return await _aiClient.GetTextResponseAsync(userPrompt, SystemPrompt, cancellationToken);
+            var userPrompt = string.Format(_promptService.GetUserPrompt(version: 1), text);
+            return await _aiClient.GetTextResponseAsync(
+                userPrompt,
+                _promptService.GetSystemPrompt(version: 1),
+                cancellationToken);
         }
     }
 }
