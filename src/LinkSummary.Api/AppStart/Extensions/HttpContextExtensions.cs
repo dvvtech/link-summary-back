@@ -16,7 +16,8 @@ namespace LinkSummary.Api.AppStart.Extensions
                 return realIp;
             }
 
-            return "unknown";
+            // Если нет заголовков, используем RemoteIpAddress
+            return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         }
     }
 }
