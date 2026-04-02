@@ -111,7 +111,9 @@ namespace LinkSummary.Api.Controllers
         public string Test2()
         {
             var clientIp = GetRealClientIp(HttpContext);
+            var realIp = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
             _logger.LogInformation($"ip: {clientIp}");
+            _logger.LogInformation($"R_ip: {realIp}");
             return "1477";
         }
     }
