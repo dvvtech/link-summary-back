@@ -1,8 +1,11 @@
-﻿using LinkSummary.Api.AppStart.Extensions;
+using FluentValidation;
+using LinkSummary.Api.AppStart.Extensions;
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.BLL.Services;
 using LinkSummary.Api.Configuration;
 using LinkSummary.Api.HealthChecks;
+using LinkSummary.Api.Models;
+using LinkSummary.Api.Validators;
 using System.Net;
 
 namespace LinkSummary.Api.AppStart
@@ -58,6 +61,7 @@ namespace LinkSummary.Api.AppStart
             _builder.Services.AddScoped<IPromptService, PromptService>();
             _builder.Services.AddHttpClient<IWebPageTextExtractor, WebPageTextExtractor>();
             _builder.Services.AddScoped<ISummarizeService, SummarizeService>();
+            _builder.Services.AddScoped<IValidator<SummarizeRequest>, SummarizeRequestValidator>();
         }
         
         private void ConfigureClientAPI()

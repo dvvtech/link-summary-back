@@ -1,5 +1,7 @@
+using FluentValidation;
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.Models;
+using LinkSummary.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkSummary.Api.Controllers
@@ -11,17 +13,20 @@ namespace LinkSummary.Api.Controllers
         private readonly IAnalyticsTrackingService _analyticsTrackingService;
         private readonly IWebPageTextExtractor _webPageTextExtractor;
         private readonly ISummarizeService _summarizeService;
+        private readonly IValidator<SummarizeRequest> _summarizeRequestValidator;
         private readonly ILogger<SummarizeController> _logger;
 
         public SummarizeController(
             IAnalyticsTrackingService analyticsTrackingService,
             IWebPageTextExtractor webPageTextExtractor,
             ISummarizeService summarizeService,
+            IValidator<SummarizeRequest> summarizeRequestValidator,
             ILogger<SummarizeController> logger)
         {
             _analyticsTrackingService = analyticsTrackingService;
             _webPageTextExtractor = webPageTextExtractor;
             _summarizeService = summarizeService;
+            _summarizeRequestValidator = summarizeRequestValidator;
             _logger = logger;
 
         }
@@ -29,22 +34,13 @@ namespace LinkSummary.Api.Controllers
         [HttpPost("run")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Url))
+            var validationResult = await _summarizeRequestValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
             {
                 return BadRequest(new SummarizeResponse
                 {
                     Success = false,
-                    ErrorMessage = "URL не может быть пустым."
-                });
-            }
-
-            if (!Uri.TryCreate(request.Url, UriKind.Absolute, out var uriResult) ||
-                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
-            {
-                return BadRequest(new SummarizeResponse
-                {
-                    Success = false,
-                    ErrorMessage = "Некорректный формат URL."
+                    ErrorMessage = validationResult.Errors[0].ErrorMessage
                 });
             }
 
