@@ -6,7 +6,10 @@ using LinkSummary.Api.Configuration;
 using LinkSummary.Api.HealthChecks;
 using LinkSummary.Api.Models;
 using LinkSummary.Api.Validators;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Net;
+using System.Threading.RateLimiting;
 
 namespace LinkSummary.Api.AppStart
 {
@@ -36,6 +39,7 @@ namespace LinkSummary.Api.AppStart
             InitConfigs();
             ConfigureClientAPI();
             ConfigureServices();
+            ConfigureRateLimiting();
 
             _builder.Services
                 .AddHealthChecks()
@@ -62,6 +66,39 @@ namespace LinkSummary.Api.AppStart
             _builder.Services.AddHttpClient<IWebPageTextExtractor, WebPageTextExtractor>();
             _builder.Services.AddScoped<ISummarizeService, SummarizeService>();
             _builder.Services.AddScoped<IValidator<SummarizeRequest>, SummarizeRequestValidator>();
+        }
+
+        private void ConfigureRateLimiting()
+        {
+            _builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.OnRejected = async (context, cancellationToken) =>
+                {
+                    context.HttpContext.Response.ContentType = "application/json";
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(new SummarizeResponse
+                    {
+                        Success = false,
+                        ErrorMessage = "Превышено количество запросов. Попробуйте позже."
+                    }, cancellationToken);
+                };
+
+                options.AddPolicy("SummarizeRequests", httpContext =>
+                {
+                    var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: clientIp,
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            AutoReplenishment = true
+                        });
+                });
+            });
         }
         
         private void ConfigureClientAPI()

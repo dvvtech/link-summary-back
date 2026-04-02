@@ -1,8 +1,8 @@
 using FluentValidation;
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.Models;
-using LinkSummary.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LinkSummary.Api.Controllers
 {
@@ -32,6 +32,7 @@ namespace LinkSummary.Api.Controllers
         }
 
         [HttpPost("run")]
+        [EnableRateLimiting("SummarizeRequests")]
         public async Task<ActionResult<SummarizeResponse>> Summarize([FromBody] SummarizeRequest request)
         {
             var validationResult = await _summarizeRequestValidator.ValidateAsync(request);
