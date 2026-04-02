@@ -1,8 +1,6 @@
 using HealthChecks.UI.Client;
 using LinkSummary.Api.AppStart;
 using LinkSummary.Api.AppStart.Extensions;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 

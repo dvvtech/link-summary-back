@@ -102,7 +102,7 @@ namespace LinkSummary.Api.Controllers
             if (!string.IsNullOrEmpty(realIp))
             {
                 return realIp;
-            }
+            }            
 
             return "unknown";
         }
@@ -114,6 +114,11 @@ namespace LinkSummary.Api.Controllers
             var realIp = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
             _logger.LogInformation($"ip: {clientIp}");
             _logger.LogInformation($"R_ip: {realIp}");
+
+            var clientIp2 = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";            
+            _logger.LogInformation($"ip3: {clientIp2}");
+            
+
             return "1477";
         }
     }

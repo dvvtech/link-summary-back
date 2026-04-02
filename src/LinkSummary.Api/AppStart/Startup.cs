@@ -6,8 +6,6 @@ using LinkSummary.Api.Configuration;
 using LinkSummary.Api.HealthChecks;
 using LinkSummary.Api.Models;
 using LinkSummary.Api.Validators;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.RateLimiting;
 using System.Net;
 using System.Threading.RateLimiting;
 
