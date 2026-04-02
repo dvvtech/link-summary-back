@@ -90,13 +90,14 @@ namespace LinkSummary.Api.Controllers
         }
 
         private string GetRealClientIp(HttpContext context)
-        {            
+        {
+            _logger.LogInformation("1");
             var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrEmpty(forwardedFor))
             {
                 return forwardedFor.Split(',').First().Trim();
             }
-
+            _logger.LogInformation("2");
             var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
             if (!string.IsNullOrEmpty(realIp))
             {
