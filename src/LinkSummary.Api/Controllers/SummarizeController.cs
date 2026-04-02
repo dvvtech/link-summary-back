@@ -1,4 +1,5 @@
 using FluentValidation;
+using LinkSummary.Api.AppStart.Extensions;
 using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,7 @@ namespace LinkSummary.Api.Controllers
 
             try
             {
-                var clientIp = GetRealClientIp(HttpContext);
+                var clientIp = HttpContext.GetRealClientIp();
                 var userAgent = Request.Headers["User-Agent"].ToString();
 
                 _ = _analyticsTrackingService.TrackLinkSummaryVisitAsync(request.Url, clientIp, userAgent);
@@ -89,26 +90,10 @@ namespace LinkSummary.Api.Controllers
             }
         }
 
-        private string GetRealClientIp(HttpContext context)
-        {            
-            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedFor))
-            {
-                return forwardedFor.Split(',').First().Trim();
-            }            
-            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(realIp))
-            {
-                return realIp;
-            }            
-
-            return "unknown";
-        }
-
         [HttpGet("test2")]
         public string Test2()
         {
-            var clientIp = GetRealClientIp(HttpContext);            
+            var clientIp = HttpContext.GetRealClientIp();            
 
             return "1477";
         }
