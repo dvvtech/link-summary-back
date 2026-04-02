@@ -84,7 +84,7 @@ namespace LinkSummary.Api.AppStart
 
                 options.AddPolicy("SummarizeRequests", httpContext =>
                 {
-                    var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                    var clientIp = GetRealClientIp(httpContext);
 
                     return RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: clientIp,
@@ -134,6 +134,22 @@ namespace LinkSummary.Api.AppStart
                     }
                     return handler;
                 });
+        }
+
+        private string GetRealClientIp(HttpContext context)
+        {
+            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                return forwardedFor.Split(',').First().Trim();
+            }
+            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(realIp))
+            {
+                return realIp;
+            }
+
+            return "unknown";
         }
     }
 }
