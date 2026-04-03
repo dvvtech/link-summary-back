@@ -4,7 +4,7 @@ namespace LinkSummary.Api.BLL.Services
 {
     public class AnalyticsTrackingService : IAnalyticsTrackingService
     {
-        private const string TrackLinkSummaryUrl = "http://analytics_api:8080/v1/analytics/track-link-summary";
+        private const string TrackUrl = "http://analytics_api:8080/v1/analytics/track-link-summary";
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<AnalyticsTrackingService> _logger;
@@ -17,7 +17,7 @@ namespace LinkSummary.Api.BLL.Services
             _logger = logger;
         }
 
-        public async Task TrackLinkSummaryVisitAsync(
+        public async Task TrackVisitAsync(
             string link,
             string clientIp,
             string? userAgent,
@@ -27,7 +27,7 @@ namespace LinkSummary.Api.BLL.Services
             {
                 var httpClient = _httpClientFactory.CreateClient();
 
-                using var request = new HttpRequestMessage(HttpMethod.Get, TrackLinkSummaryUrl);
+                using var request = new HttpRequestMessage(HttpMethod.Get, TrackUrl);
                 request.Headers.Add("X-Forwarded-For", clientIp);
                 request.Headers.Add("X-Real-IP", clientIp);
                 request.Headers.Add("X-Operation-Link", link);

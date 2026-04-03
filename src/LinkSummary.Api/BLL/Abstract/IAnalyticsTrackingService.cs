@@ -2,7 +2,7 @@ namespace LinkSummary.Api.BLL.Abstract
 {
     public interface IAnalyticsTrackingService
     {
-        Task TrackLinkSummaryVisitAsync(
+        Task TrackVisitAsync(
             string link,
             string clientIp,
             string? userAgent,

@@ -51,7 +51,7 @@ namespace LinkSummary.Api.Controllers
                 var clientIp = HttpContext.GetRealClientIp();
                 var userAgent = Request.Headers["User-Agent"].ToString();
 
-                _ = _analyticsTrackingService.TrackLinkSummaryVisitAsync(request.Url, clientIp, userAgent);
+                _ = _analyticsTrackingService.TrackVisitAsync(request.Url, clientIp, userAgent);
 
                 var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
 
