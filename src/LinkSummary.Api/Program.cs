@@ -19,7 +19,7 @@ else
     app.ApplyCors();
 }
 
-app.UseForwardedHeaders();
+//app.UseForwardedHeaders();
 app.UseRateLimiter();
 
 app.MapControllers();
