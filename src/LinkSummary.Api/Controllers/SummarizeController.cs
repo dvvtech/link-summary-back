@@ -4,6 +4,7 @@ using LinkSummary.Api.BLL.Abstract;
 using LinkSummary.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace LinkSummary.Api.Controllers
 {
@@ -11,25 +12,33 @@ namespace LinkSummary.Api.Controllers
     [Route("")]
     public class SummarizeController : ControllerBase
     {
+        private const string CacheKeyPrefix = "chunks_";
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(60);
+
         private readonly IAnalyticsTrackingService _analyticsTrackingService;
         private readonly IWebPageTextExtractor _webPageTextExtractor;
+        private readonly ITextChunker _textChunker;
         private readonly ISummarizeService _summarizeService;
         private readonly IValidator<SummarizeRequest> _summarizeRequestValidator;
+        private readonly IMemoryCache _cache;
         private readonly ILogger<SummarizeController> _logger;
 
         public SummarizeController(
             IAnalyticsTrackingService analyticsTrackingService,
             IWebPageTextExtractor webPageTextExtractor,
+            ITextChunker textChunker,
             ISummarizeService summarizeService,
             IValidator<SummarizeRequest> summarizeRequestValidator,
+            IMemoryCache cache,
             ILogger<SummarizeController> logger)
         {
             _analyticsTrackingService = analyticsTrackingService;
             _webPageTextExtractor = webPageTextExtractor;
+            _textChunker = textChunker;
             _summarizeService = summarizeService;
             _summarizeRequestValidator = summarizeRequestValidator;
+            _cache = cache;
             _logger = logger;
-
         }
 
         [HttpPost("run")]
@@ -53,23 +62,37 @@ namespace LinkSummary.Api.Controllers
 
                 _ = _analyticsTrackingService.TrackVisitAsync(request.Url, clientIp, userAgent);
 
-                var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
-
-                if (string.IsNullOrWhiteSpace(extractedText) || extractedText.Length < 100)
+                var cacheKey = CacheKeyPrefix + request.Url;
+                if (!_cache.TryGetValue(cacheKey, out List<string>? chunks))
                 {
-                    return BadRequest(new SummarizeResponse
+                    var extractedText = await _webPageTextExtractor.ExtractTextFromUrlAsync(request.Url);
+
+                    if (string.IsNullOrWhiteSpace(extractedText) || extractedText.Length < 100)
                     {
-                        Success = false,
-                        ErrorMessage = "Не удалось извлечь текст из статьи. Возможно, статья слишком короткая или недоступна."
-                    });
+                        return BadRequest(new SummarizeResponse
+                        {
+                            Success = false,
+                            ErrorMessage = "Не удалось извлечь текст из статьи. Возможно, статья слишком короткая или недоступна."
+                        });
+                    }
+
+                    chunks = _textChunker.Chunk(extractedText);
+                    _cache.Set(cacheKey, chunks, CacheDuration);
                 }
 
-                var summary = await _summarizeService.SummarizeTextAsync(extractedText);
+                var page = request.Page < 1 ? 1 : request.Page;
+                if (page > chunks.Count)
+                    page = chunks.Count;
+
+                var chunkText = chunks[page - 1];
+                var summary = await _summarizeService.SummarizeTextAsync(chunkText);
 
                 return Ok(new SummarizeResponse
                 {
                     Success = true,
-                    Summary = summary
+                    Summary = summary,
+                    CurrentPage = page,
+                    TotalPages = chunks.Count
                 });
             }
             catch (HttpRequestException ex)
@@ -93,7 +116,7 @@ namespace LinkSummary.Api.Controllers
         [HttpGet("test2")]
         public string Test2()
         {
-            var clientIp = HttpContext.GetRealClientIp();            
+            var clientIp = HttpContext.GetRealClientIp();
 
             return "1477";
         }

@@ -12,6 +12,10 @@ namespace LinkSummary.Api.Validators
                 .WithMessage("URL не может быть пустым.")
                 .Must(BeValidHttpUrl)
                 .WithMessage("Некорректный формат URL.");
+
+            RuleFor(x => x.Page)
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("Номер страницы должен быть не менее 1.");
         }
 
         private static bool BeValidHttpUrl(string? url)
