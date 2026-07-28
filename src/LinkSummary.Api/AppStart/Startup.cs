@@ -115,7 +115,7 @@ namespace LinkSummary.Api.AppStart
                 {
                     var handler = new HttpClientHandler();
 
-                    var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
+                    var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
 
                     //if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
                     //{
