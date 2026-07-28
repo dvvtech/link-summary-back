@@ -117,11 +117,11 @@ namespace LinkSummary.Api.AppStart
 
                     var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
 
-                    if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
-                    {
+                    //if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
+                    //{
                         var proxy = new WebProxy
                         {
-                            Address = new Uri($"http://{proxyConfig.Ip}:{proxyConfig.Port}"),
+                            Address = new Uri(proxyConfig.Url),
                             BypassProxyOnLocal = false,
                             UseDefaultCredentials = false
                         };
@@ -133,7 +133,7 @@ namespace LinkSummary.Api.AppStart
 
                         handler.Proxy = proxy;
                         handler.UseProxy = true;
-                    }
+                    //}
                     return handler;
                 });
         }

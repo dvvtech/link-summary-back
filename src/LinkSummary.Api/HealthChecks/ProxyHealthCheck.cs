@@ -37,10 +37,10 @@ namespace LinkSummary.Api.HealthChecks
             {
                 var proxyConfig = _configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
 
-                if (proxyConfig?.Enabled != true)
-                {
+                //if (proxyConfig?.Enabled != true)
+                //{
                     return HealthCheckResult.Degraded("Proxy is disabled in configuration");
-                }
+                //}
 
                 // Проверяем каждый эндпоинт пока не найдем работающий
                 foreach (var endpoint in _testEndpoints)
@@ -50,7 +50,7 @@ namespace LinkSummary.Api.HealthChecks
                     if (result.IsHealthy)
                     {
                         return HealthCheckResult.Healthy(
-                            $"Proxy {proxyConfig.Ip}:{proxyConfig.Port} is working. " +
+                            $"Proxy {proxyConfig.Url} is working. " +
                             $"Successfully reached {endpoint}");
                     }
 
@@ -60,7 +60,7 @@ namespace LinkSummary.Api.HealthChecks
 
                 // Если все эндпоинты недоступны
                 return HealthCheckResult.Unhealthy(
-                    $"Proxy {proxyConfig.Ip}:{proxyConfig.Port} is not reachable. " +
+                    $"Proxy {proxyConfig.Url} is not reachable. " +
                     "Failed to connect to any test endpoint");
             }
             catch (Exception ex)
@@ -81,7 +81,7 @@ namespace LinkSummary.Api.HealthChecks
                 {
                     Proxy = new WebProxy
                     {
-                        Address = new Uri($"http://{proxyConfig.Ip}:{proxyConfig.Port}"),
+                        Address = new Uri(proxyConfig.Url),
                         BypassProxyOnLocal = false,
                         UseDefaultCredentials = false,
                         Credentials = (!string.IsNullOrEmpty(proxyConfig.Login) &&
