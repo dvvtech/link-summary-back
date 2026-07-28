@@ -39,7 +39,7 @@ namespace LinkSummary.Api.HealthChecks
 
                 //if (proxyConfig?.Enabled != true)
                 //{
-                    return HealthCheckResult.Degraded("Proxy is disabled in configuration");
+                    //return HealthCheckResult.Degraded("Proxy is disabled in configuration");
                 //}
 
                 // Проверяем каждый эндпоинт пока не найдем работающий
