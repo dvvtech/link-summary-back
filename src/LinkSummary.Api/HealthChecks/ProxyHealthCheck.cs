@@ -15,7 +15,7 @@ namespace LinkSummary.Api.HealthChecks
         {
             "https://dns.google/resolve?name=google.com&type=A",
             "https://httpbin.org/get",
-            "https://cloudflare-dns.com/dns-query?name=example.com&type=A",
+            //"https://cloudflare-dns.com/dns-query?name=example.com&type=A",
             "http://ip-api.com/json"
         };
 
